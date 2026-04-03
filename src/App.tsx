@@ -1,11 +1,16 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { cn } from "./lib";
+import { createId } from "@paralleldrive/cuid2";
+
+const userId = createId();
 
 function App() {
 	const [websocket, setWebsocket] = useState<WebSocket | null>(null);
 	const [message, setMessage] = useState("");
-	const [messages, setMessages] = useState<string[]>([]);
+	const [messages, setMessages] = useState<
+		{ userId: string; content: string }[]
+	>([]);
 
 	function onChangeInput(e: React.ChangeEvent<HTMLInputElement>) {
 		setMessage(e?.target?.value);
@@ -15,14 +20,15 @@ function App() {
 		e.preventDefault();
 
 		if (websocket) {
-			websocket.send(message);
+			const data = JSON.stringify({ content: message, userId });
+			websocket.send(data);
 		}
 
 		setMessage("");
 	}
 
 	async function connectWs() {
-		const ws = new WebSocket("ws://localhost:3001/ws");
+		const ws = new WebSocket(`ws://localhost:3001/ws?userId=${userId}`);
 
 		return new Promise((resolve, reject) => {
 			const timer = setInterval(() => {
@@ -31,12 +37,16 @@ function App() {
 					ws.onopen = () => {
 						console.log("ws connected");
 					};
+
 					ws.onmessage = (event) => {
-						setMessages((prev) => [...prev, event.data]);
+						const data = JSON.parse(event.data);
+						setMessages((prev) => [...prev, data]);
 					};
+
 					ws.onclose = () => {
 						console.log("ws closed");
 					};
+
 					setWebsocket(ws);
 					resolve(ws);
 				}
@@ -61,11 +71,17 @@ function App() {
 				<ul className="min-h-50 border border-black p-2 rounded-lg w-full">
 					{messages.map((message, i) => {
 						return (
-							<li
-								key={i}
-								className={cn("p-1", i % 2 === 0 ? "bg-gray-300" : "")}
-							>
-								{message}
+							<li key={i} className={cn("p-1", i % 2 === 0 && "bg-gray-300")}>
+								{message?.userId === userId ? (
+									<p>
+										<span className="font-semibold">You:</span>{" "}
+										{message.content}
+									</p>
+								) : (
+									<p>
+										<span>User:</span> {message.content}
+									</p>
+								)}
 							</li>
 						);
 					})}
