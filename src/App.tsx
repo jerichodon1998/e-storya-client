@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./App.css";
 import { cn } from "./lib";
 import { createId } from "@paralleldrive/cuid2";
@@ -6,7 +6,10 @@ import { createId } from "@paralleldrive/cuid2";
 const userId = createId();
 
 function App() {
-	const [websocket, setWebsocket] = useState<WebSocket | null>(null);
+	const intervalId = useRef(0);
+	const backoffDelay = useRef(2_000);
+	const isWebsocketConnected = useRef(false);
+	const websocket = useRef<WebSocket | null>(null);
 	const [message, setMessage] = useState("");
 	const [messages, setMessages] = useState<
 		{ userId: string; content: string }[]
@@ -21,46 +24,60 @@ function App() {
 
 		if (websocket) {
 			const data = JSON.stringify({ content: message, userId });
-			websocket.send(data);
+			websocket.current?.send(data);
 		}
 
 		setMessage("");
 	}
 
-	async function connectWs() {
+	function connectWs() {
+		console.log("connecting ws");
+
 		const ws = new WebSocket(`ws://localhost:3001/ws?userId=${userId}`);
 
-		return new Promise((resolve, reject) => {
-			const timer = setInterval(() => {
-				if (ws.readyState === 1) {
-					clearInterval(timer);
-					ws.onopen = () => {
-						console.log("ws connected");
-					};
+		ws.onopen = () => {
+			console.log("websocket connected");
+			isWebsocketConnected.current = true;
+			websocket.current = ws;
+			clearInterval(intervalId.current);
+		};
 
-					ws.onmessage = (event) => {
-						const data = JSON.parse(event.data);
-						setMessages((prev) => [...prev, data]);
-					};
+		ws.onmessage = (event) => {
+			const data = JSON.parse(event.data);
+			setMessages((prev) => [...prev, data]);
+		};
 
-					ws.onclose = () => {
-						console.log("ws closed");
-					};
+		ws.onerror = async (event) => {
+			isWebsocketConnected.current = false;
+			console.log("ws error", event);
+		};
 
-					setWebsocket(ws);
-					resolve(ws);
-				}
-			}, 10);
-		});
+		ws.onclose = async (event) => {
+			clearInterval(intervalId.current);
+			const delay = Math.floor(Math.random() * backoffDelay.current);
+
+			isWebsocketConnected.current = false;
+			intervalId.current = setInterval(() => {
+				connectWs();
+			}, delay);
+
+			if (backoffDelay.current < 60_000) {
+				backoffDelay.current = backoffDelay.current + 2000;
+			}
+
+			console.log("ws closed", event);
+		};
 	}
 
 	useEffect(() => {
-		if (!websocket) {
+		if (!websocket.current) {
 			connectWs();
 		}
 
 		return () => {
-			setWebsocket(null);
+			websocket.current?.close();
+			websocket.current = null;
+			clearInterval(intervalId.current);
 		};
 	}, []);
 
