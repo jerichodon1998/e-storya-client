@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { cn } from "./lib";
 import { useChatWebsocket } from "@hooks/useChatWebsocket";
-import "./App.css";
+import { cn } from "@lib";
 
-function App() {
+function MessagingPage() {
 	const { chatWebsocketService, messages, userId } = useChatWebsocket();
 	const [message, setMessage] = useState("");
 
@@ -63,4 +62,4 @@ function App() {
 	);
 }
 
-export default App;
+export default MessagingPage;

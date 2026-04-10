@@ -8,6 +8,13 @@ import { defineConfig, globalIgnores } from "eslint/config";
 export default defineConfig([
 	globalIgnores(["dist"]),
 	{
+		settings: {
+			"import/resolver": {
+				typescript: {
+					project: "./tsconfig.json",
+				},
+			},
+		},
 		files: ["**/*.{ts,tsx}"],
 		extends: [
 			js.configs.recommended,
