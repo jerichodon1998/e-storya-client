@@ -13,7 +13,7 @@ const useChatWebsocket = () => {
 	useEffect(() => {
 		if (!chatWebsocketService.current) {
 			chatWebsocketService.current = new ClientWebSocketService({
-				url: "ws://localhost:3001/ws",
+				url: "ws://localhost:3001/v1/ws",
 				name: "chat app",
 				userId,
 				onmessage: (event) => {
