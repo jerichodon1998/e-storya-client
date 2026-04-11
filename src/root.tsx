@@ -6,14 +6,14 @@ import {
 } from "react-router";
 import type { Route } from "./+types/root";
 
-import "./index.css";
-import "./app.css";
+import indexCss from "./index.css?url";
 
 export default function Root() {
 	return (
 		<html lang="en">
 			<head>
 				<link rel="icon" href="/favicon.svg" />
+				<link rel="stylesheet" href={indexCss} />
 			</head>
 			<body>
 				<Outlet />
