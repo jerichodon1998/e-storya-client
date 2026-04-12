@@ -1,17 +1,13 @@
-import type { ObjectId } from "bson";
-
 class ClientWebSocketService {
 	backoffDelay = 2_000;
 	isWebsocketConnected = false;
 	websocket: WebSocket = null;
-	intervalId = 0;
+	intervalId: NodeJS.Timeout;
 	name: string;
-	userId: ObjectId;
 
 	constructor(params: {
 		url: string;
 		name: string;
-		userId: ObjectId;
 		onopen?: (event: Event) => any;
 		onmessage?: (event: MessageEvent<any>) => any;
 		onerror?: (event: Event) => any;
@@ -19,7 +15,6 @@ class ClientWebSocketService {
 	}) {
 		const { name, ...rest } = params;
 		this.name = name;
-		this.userId = params.userId;
 		this.websocketInit(rest);
 	}
 
@@ -33,7 +28,7 @@ class ClientWebSocketService {
 		console.log("connecting ws");
 
 		const { url, onopen, onmessage, onerror, onclose } = params;
-		const ws = new WebSocket(`${url}?userId=${this.userId}`);
+		const ws = new WebSocket(url);
 
 		ws.onopen = (event) => {
 			console.log(`${this.name} connected to websocket`);

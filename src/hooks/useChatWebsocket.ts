@@ -1,8 +1,5 @@
-import { ClientWebSocketService } from "@lib/services/websocketService";
-import { ObjectId } from "bson";
+import { ClientWebSocketService } from "@lib";
 import { useEffect, useRef, useState } from "react";
-
-const userId = new ObjectId();
 
 const useChatWebsocket = () => {
 	const chatWebsocketService = useRef<ClientWebSocketService | null>(null);
@@ -15,7 +12,6 @@ const useChatWebsocket = () => {
 			chatWebsocketService.current = new ClientWebSocketService({
 				url: "ws://localhost:3001/v1/ws",
 				name: "chat app",
-				userId,
 				onmessage: (event) => {
 					const data = JSON.parse(event.data);
 					console.log("data", data);
@@ -31,7 +27,7 @@ const useChatWebsocket = () => {
 		};
 	}, []);
 
-	return { chatWebsocketService, messages, userId };
+	return { chatWebsocketService, messages };
 };
 
 export { useChatWebsocket };

@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { useChatWebsocket } from "@hooks/useChatWebsocket";
 import { cn } from "@lib";
+import { useAuth } from "@hooks/useAuth";
+import { ObjectId } from "bson";
 
 function MessagingPage() {
-	const { chatWebsocketService, messages, userId } = useChatWebsocket();
+	const { chatWebsocketService, messages } = useChatWebsocket();
+	const { user } = useAuth();
 	const [message, setMessage] = useState("");
 
 	function onChangeInput(e: React.ChangeEvent<HTMLInputElement>) {
@@ -14,7 +17,7 @@ function MessagingPage() {
 		e.preventDefault();
 
 		if (chatWebsocketService) {
-			const data = JSON.stringify({ content: message, userId });
+			const data = JSON.stringify({ content: message, userId: user?._id });
 			chatWebsocketService.current?.websocket?.send(data);
 		}
 
@@ -24,13 +27,14 @@ function MessagingPage() {
 	return (
 		<div className="w-full flex flex-col items-center justify-center p-4">
 			<h1 className="font-bold text-[24px]">E-storya</h1>
-			<h1>{userId?.toString()}</h1>
 			<div className="w-[50%] flex flex-col items-center justify-center gap-4">
 				<ul className="min-h-50 border border-black p-2 rounded-lg w-full">
 					{messages.map((message, i) => {
 						return (
 							<li key={i} className={cn("p-1", i % 2 === 0 && "bg-gray-300")}>
-								{userId.equals(message?.userId) ? (
+								{(user?._id instanceof ObjectId &&
+									user?._id.equals(message?.userId)) ||
+								user?._id === message?.userId ? (
 									<p>
 										<span className="font-semibold">You:</span>{" "}
 										{message.content}
