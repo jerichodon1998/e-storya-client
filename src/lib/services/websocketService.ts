@@ -27,6 +27,10 @@ class ClientWebSocketService {
 	}) {
 		console.log("connecting ws");
 
+		if (this.websocket) {
+			return;
+		}
+
 		const { url, onopen, onmessage, onerror, onclose } = params;
 		const ws = new WebSocket(url);
 
