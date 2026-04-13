@@ -1,1 +1,1 @@
-export { ClientWebSocketService } from "./websocketService";
+export * from "./websocketService";

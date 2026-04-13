@@ -1,9 +1,12 @@
-import { axiosRestInstance } from "@lib";
+import { axiosRestInstance, useAppStore } from "@lib";
 import type { IUser } from "@types";
 import { useEffect, useState } from "react";
+import { useShallow } from "zustand/shallow";
 
 const useAuth = () => {
-	const [user, setUser] = useState<IUser | null>(null);
+	const { user, setUser } = useAppStore(
+		useShallow((state) => ({ user: state.user, setUser: state.setUser }))
+	);
 
 	useEffect(() => {
 		axiosRestInstance

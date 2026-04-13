@@ -16,9 +16,12 @@ function MessagingPage() {
 	function sendMessage(e: React.SubmitEvent<HTMLFormElement>) {
 		e.preventDefault();
 
-		if (chatWebsocketService) {
+		if (
+			chatWebsocketService &&
+			chatWebsocketService?.websocket?.readyState === WebSocket.OPEN
+		) {
 			const data = JSON.stringify({ content: message, userId: user?._id });
-			chatWebsocketService.current?.websocket?.send(data);
+			chatWebsocketService?.websocket?.send(data);
 		}
 
 		setMessage("");
@@ -26,6 +29,9 @@ function MessagingPage() {
 
 	return (
 		<div className="w-full flex flex-col items-center justify-center p-4">
+			<button onClick={() => chatWebsocketService?.close()}>
+				Disconnect WS
+			</button>
 			<h1 className="font-bold text-[24px]">E-storya</h1>
 			<div className="w-[50%] flex flex-col items-center justify-center gap-4">
 				<ul className="min-h-50 border border-black p-2 rounded-lg w-full">

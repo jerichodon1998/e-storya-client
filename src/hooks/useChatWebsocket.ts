@@ -1,29 +1,38 @@
-import { ClientWebSocketService } from "@lib";
-import { useEffect, useRef, useState } from "react";
+import { ClientWebSocketService, useWebSocketStore } from "@lib";
+import { useCallback, useEffect, useState } from "react";
+import { useShallow } from "zustand/shallow";
 
 const useChatWebsocket = () => {
-	const chatWebsocketService = useRef<ClientWebSocketService | null>(null);
+	const { chatWebsocketService, setChatWebsocketService } = useWebSocketStore(
+		useShallow((state) => ({
+			chatWebsocketService: state.websocketChatInstance,
+			setChatWebsocketService: state.setWebsocketChatInstance,
+		}))
+	);
 	const [messages, setMessages] = useState<
 		{ userId: string; content: string }[]
 	>([]);
 
+	const sendMessage = useCallback((event) => {
+		const data = JSON.parse(event.data);
+		console.log("data", data);
+		setMessages((prev) => [...prev, data]);
+	}, []);
+
 	useEffect(() => {
-		if (!chatWebsocketService.current) {
-			chatWebsocketService.current = new ClientWebSocketService({
-				url: "ws://localhost:3001/v1/ws",
-				name: "chat app",
-				onmessage: (event) => {
-					const data = JSON.parse(event.data);
-					console.log("data", data);
-					setMessages((prev) => [...prev, data]);
-				},
-			});
+		const chatWebsocketInstance = new ClientWebSocketService({
+			url: "ws://localhost:3001/v1/ws",
+			name: "chat app",
+			onmessage: sendMessage,
+		});
+
+		if (!chatWebsocketService) {
+			setChatWebsocketService(chatWebsocketInstance);
 		}
 
 		return () => {
-			clearInterval(chatWebsocketService.current?.intervalId);
-			chatWebsocketService.current?.close();
-			chatWebsocketService.current = null;
+			chatWebsocketInstance.close();
+			setChatWebsocketService(null);
 		};
 	}, []);
 
