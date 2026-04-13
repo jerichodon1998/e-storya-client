@@ -1,8 +1,14 @@
 class ClientWebSocketService {
 	backoffDelay = 2_000;
-	isWebsocketConnected = false;
 	websocket: WebSocket = null;
-	intervalId: NodeJS.Timeout;
+	timeoutId: NodeJS.Timeout;
+	/**
+	 * Controls whether the websocket should reconnect after closing.
+	 *
+	 * - "temporary": allows automatic reconnection using backoff logic
+	 * - "permanent": prevents any reconnection and fully terminates the connection
+	 */
+	websocketCloseType: "permanent" | "temporary" = "temporary";
 	name: string;
 
 	constructor(params: {
@@ -27,20 +33,16 @@ class ClientWebSocketService {
 	}) {
 		console.log("connecting ws");
 
-		if (this.websocket) {
-			return;
-		}
-
 		const { url, onopen, onmessage, onerror, onclose } = params;
 		const ws = new WebSocket(url);
 
+		this.websocket = ws;
+
 		ws.onopen = (event) => {
 			console.log(`${this.name} connected to websocket`);
-			this.isWebsocketConnected = true;
-			this.websocket = ws;
 			this.backoffDelay = 2_000;
-			clearInterval(this.intervalId);
-			this.intervalId = null;
+			clearInterval(this.timeoutId);
+			this.timeoutId = null;
 			onopen?.(event);
 		};
 
@@ -48,41 +50,43 @@ class ClientWebSocketService {
 			onmessage?.(event);
 		};
 
-		ws.onerror = async (event) => {
+		ws.onerror = (event) => {
 			console.log(`${this.name} websocket error`, event);
-			this.isWebsocketConnected = false;
 			onerror?.(event);
 		};
 
-		ws.onclose = async (event) => {
+		ws.onclose = (event) => {
 			console.log(`${this.name} websocket closed`, event);
-			this.isWebsocketConnected = false;
-			clearInterval(this.intervalId);
-			this.intervalId = null;
+			clearTimeout(this.timeoutId);
+			this.websocket = null;
+			this.timeoutId = null;
 
-			if (this.isWebsocketConnected) {
-				return;
+			if (this.websocketCloseType !== "permanent") {
+				const delay = Math.floor(Math.random() * this.backoffDelay);
+
+				console.log("delay", delay);
+				console.log("backoffDelay", this.backoffDelay);
+
+				this.timeoutId = setTimeout(() => {
+					this.websocketInit(params);
+				}, delay);
+
+				if (this.backoffDelay < 60_000) {
+					this.backoffDelay = this.backoffDelay + 2000;
+				}
 			}
 
-			const delay = Math.floor(Math.random() * this.backoffDelay);
-
-			console.log("delay", delay);
-			console.log("backoffDelay", this.backoffDelay);
-
-			this.intervalId = setInterval(() => {
-				this.websocketInit(params);
-			}, delay);
-
-			if (this.backoffDelay < 60_000) {
-				this.backoffDelay = this.backoffDelay + 2000;
-			}
 			onclose?.(event);
 		};
 	}
 
 	close() {
-		this.websocket?.close();
-		clearInterval(this.intervalId);
+		this.websocketCloseType = "permanent";
+		clearTimeout(this.timeoutId);
+
+		if (this.websocket) {
+			this.websocket.close(1000, "client closed");
+		}
 	}
 }
 
