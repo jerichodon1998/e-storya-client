@@ -41,7 +41,7 @@ class ClientWebSocketService {
 		ws.onopen = (event) => {
 			console.log(`${this.name} connected to websocket`);
 			this.backoffDelay = 2_000;
-			clearInterval(this.timeoutId);
+			clearTimeout(this.timeoutId);
 			this.timeoutId = null;
 			onopen?.(event);
 		};
