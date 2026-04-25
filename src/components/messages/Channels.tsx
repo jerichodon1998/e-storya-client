@@ -1,16 +1,25 @@
 import { cn } from "@lib";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { map } from "lodash-es";
 import { useChannels } from "@hooks/useChannels";
+import { useEffect } from "react";
 
 export default function Channels(props: {
 	className?: React.HTMLAttributes<HTMLDivElement>["className"];
 }) {
+	const navigate = useNavigate();
+
 	const { channelId } = useParams();
 
 	const { className } = props;
 
 	const { channelsData } = useChannels();
+
+	useEffect(() => {
+		if (!channelId) {
+			navigate(`/messaging/${channelsData[0]?._id}`, { replace: true });
+		}
+	}, [channelsData]);
 
 	return (
 		<div
