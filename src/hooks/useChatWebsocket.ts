@@ -1,29 +1,28 @@
 import { ClientWebSocketService, useWebSocketStore } from "@lib";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
+import { useMessages } from "./useMessages";
 
 const useChatWebsocket = () => {
+	const { syncNewMessage } = useMessages();
+
 	const { chatWebsocketService, setChatWebsocketService } = useWebSocketStore(
 		useShallow((state) => ({
 			chatWebsocketService: state.websocketChatInstance,
 			setChatWebsocketService: state.setWebsocketChatInstance,
 		}))
 	);
-	const [messages, setMessages] = useState<
-		{ userId: string; content: string }[]
-	>([]);
 
-	const sendMessage = useCallback((event) => {
-		const data = JSON.parse(event.data);
-		console.log("data", data);
-		setMessages((prev) => [...prev, data]);
-	}, []);
+	const onMessage = (event: Event & { data: string }) => {
+		const parsedMessage = JSON.parse(event.data);
+		syncNewMessage({ message: parsedMessage });
+	};
 
 	useEffect(() => {
 		const chatWebsocketInstance = new ClientWebSocketService({
 			url: "ws://localhost:3001/v1/ws",
 			name: "chat app",
-			onmessage: sendMessage,
+			onmessage: onMessage,
 		});
 
 		if (!chatWebsocketService) {
@@ -36,7 +35,7 @@ const useChatWebsocket = () => {
 		};
 	}, []);
 
-	return { chatWebsocketService, messages };
+	return { chatWebsocketService };
 };
 
 export { useChatWebsocket };

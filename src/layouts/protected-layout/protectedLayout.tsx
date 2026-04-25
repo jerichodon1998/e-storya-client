@@ -1,4 +1,4 @@
-import { axiosRestInstance } from "@lib";
+import { axiosInstance } from "@lib";
 import type { IUser } from "@types";
 import { AxiosError } from "axios";
 import { Outlet, redirect } from "react-router";
@@ -13,7 +13,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	}
 
 	try {
-		const response = await axiosRestInstance.get<{ user?: IUser; error?: any }>(
+		const response = await axiosInstance.get<{ user?: IUser; error?: any }>(
 			"/v1/users/signed-in-user",
 			{
 				headers: {

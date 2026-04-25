@@ -12,6 +12,8 @@ export default [
 		route("signup", "./routes/signup.tsx"),
 	]),
 	layout("./layouts/protected-layout/protectedLayout.tsx", [
-		route("messaging", "./routes/messaging.tsx"),
+		route("messaging", "./routes/messaging/index.tsx", [
+			route(":channelId", "./routes/messaging/chatBoxPage.tsx"),
+		]),
 	]),
 ] satisfies RouteConfig;

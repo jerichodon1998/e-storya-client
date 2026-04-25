@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
 }
 
-export const axiosRestInstance = axios.create({
+export const axiosInstance = axios.create({
 	baseURL: "http://localhost:3001",
 	headers: {
 		"Content-Type": "application/json",
@@ -17,3 +17,4 @@ export const axiosRestInstance = axios.create({
 
 export * from "./services";
 export * from "./stores";
+export * from "./helpers";

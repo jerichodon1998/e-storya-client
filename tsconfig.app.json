@@ -29,7 +29,6 @@
 		"strict": false,
 		"noImplicitAny": false,
 		"noUnusedLocals": true,
-		"erasableSyntaxOnly": true,
 		"noFallthroughCasesInSwitch": true,
 		"noUncheckedSideEffectImports": true
 	},

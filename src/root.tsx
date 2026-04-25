@@ -4,9 +4,12 @@ import {
 	ScrollRestoration,
 	isRouteErrorResponse,
 } from "react-router";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { Route } from "./+types/root";
 
 import indexCss from "./index.css?url";
+
+const queryClient = new QueryClient();
 
 export default function Root() {
 	return (
@@ -16,7 +19,9 @@ export default function Root() {
 				<link rel="stylesheet" href={indexCss} />
 			</head>
 			<body>
-				<Outlet />
+				<QueryClientProvider client={queryClient}>
+					<Outlet />
+				</QueryClientProvider>
 				<ScrollRestoration />
 				<Scripts />
 			</body>

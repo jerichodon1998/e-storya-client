@@ -1,4 +1,4 @@
-import { axiosRestInstance } from "@lib";
+import { axiosInstance } from "@lib";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
@@ -14,7 +14,7 @@ export default function SignupPage() {
 	const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		try {
-			await axiosRestInstance.post("/v1/users/signup", signupFormData);
+			await axiosInstance.post("/v1/users/signup", signupFormData);
 			navigate("/messaging");
 		} catch (error) {
 			console.log("error", error);

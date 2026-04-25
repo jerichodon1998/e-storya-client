@@ -1,5 +1,5 @@
 import TopNavigationBar from "@components/topNavigationBar";
-import { axiosRestInstance } from "@lib";
+import { axiosInstance } from "@lib";
 import type { IUser } from "@types";
 import { Outlet, redirect } from "react-router";
 import type { Route } from "./+types/main";
@@ -14,7 +14,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 	}
 
 	try {
-		const response = await axiosRestInstance.get<{ user?: IUser; error?: any }>(
+		const response = await axiosInstance.get<{ user?: IUser; error?: any }>(
 			"/v1/users/signed-in-user",
 			{
 				headers: {

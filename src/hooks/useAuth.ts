@@ -1,4 +1,4 @@
-import { axiosRestInstance, useAppStore } from "@lib";
+import { axiosInstance, useAppStore } from "@lib";
 import type { IUser } from "@types";
 import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
@@ -9,7 +9,7 @@ const useAuth = () => {
 	);
 
 	useEffect(() => {
-		axiosRestInstance
+		axiosInstance
 			.get<{ user?: IUser; error?: any }>("/v1/users/signed-in-user")
 			.then(({ data }) => {
 				if (data.user) {
