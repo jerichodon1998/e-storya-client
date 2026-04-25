@@ -1,6 +1,6 @@
 import { cn } from "@lib";
 import { Link, useNavigate, useParams } from "react-router";
-import { map } from "lodash-es";
+import { head, map } from "lodash-es";
 import { useChannels } from "@hooks/useChannels";
 import { useEffect } from "react";
 
@@ -16,7 +16,7 @@ export default function Channels(props: {
 	const { channelsData } = useChannels();
 
 	useEffect(() => {
-		if (!channelId) {
+		if (!channelId && head(channelsData)) {
 			navigate(`/messaging/${channelsData[0]?._id}`, { replace: true });
 		}
 	}, [channelsData]);
