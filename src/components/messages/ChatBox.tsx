@@ -20,7 +20,8 @@ export default function ChatBox(props: {
 
 	const { className } = props;
 
-	const { messagesData } = useMessages();
+	const { messagesData, messagesDataFetchNextPage, messagesDataSuccess } =
+		useMessages();
 
 	const { chatWebsocketService } = useChatWebsocket();
 
@@ -47,6 +48,13 @@ export default function ChatBox(props: {
 		}
 	};
 
+	const handleScroll = (e: React.UIEvent<HTMLUListElement, UIEvent>) => {
+		const { scrollTop } = e.currentTarget;
+		if (scrollTop === 0 && messagesDataSuccess) {
+			messagesDataFetchNextPage();
+		}
+	};
+
 	useEffect(() => {
 		if (scrollRef.current) {
 			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -63,9 +71,7 @@ export default function ChatBox(props: {
 			<ul
 				className="overflow-y-scroll flex flex-col gap-4 pr-4 h-full"
 				ref={scrollRef}
-				onScrollEnd={() => {
-					// fetch more here
-				}}
+				onScroll={handleScroll}
 			>
 				{map(sortMessages({ messages: messagesData }), (message, i) => {
 					const itemKey = `${message._id}-${i}`;

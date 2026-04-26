@@ -1,11 +1,22 @@
 import { axiosInstance, isValidObjectId } from "@lib";
 import type { IMessage } from "@types";
 import { AxiosError } from "axios";
+import type { ObjectId } from "bson";
 
+/**
+ * Get Messages api
+ * - cursor based query.
+ *
+ * @param {string} params.channelId
+ * @param {number} params.sizePerPage
+ * @param {string | ObjectId} params.lastSeenMessageId
+ * @param {string | Date} params.lastSeenMessageCreatedAt
+ * @return {Promise<AxiosResponse<{ messages: IMessage[], error: any, message: string }>>}
+ */
 export function getMessagesApi(params: {
 	channelId: string;
 	sizePerPage?: number;
-	lastSeenMessageId?: string;
+	lastSeenMessageId?: string | ObjectId;
 	lastSeenMessageCreatedAt?: string | Date;
 }) {
 	const {
@@ -23,7 +34,7 @@ export function getMessagesApi(params: {
 		sizePerPage: sizePerPage?.toString(),
 		...(lastSeenMessageId &&
 			lastSeenMessageCreatedAt && {
-				lastSeenMessageId,
+				lastSeenMessageId: lastSeenMessageId.toString(),
 				lastSeenMessageCreatedAt: lastSeenMessageCreatedAt.toString(),
 			}),
 	});
