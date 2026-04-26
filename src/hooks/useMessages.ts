@@ -9,7 +9,7 @@ import { useAuth } from "./useAuth";
 import { getMessagesApi } from "src/lib/apis";
 import { useMemo } from "react";
 import { useParams } from "react-router";
-import type { IMessage } from "@types";
+import type { IMessage } from "@/types";
 import type { AxiosResponse } from "axios";
 
 function useMessages() {

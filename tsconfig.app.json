@@ -11,10 +11,7 @@
 		"rootDirs": [".", "./.react-router/types"],
 		"baseUrl": ".",
 		"paths": {
-			"@lib": ["src/lib"],
-			"@hooks/*": ["src/hooks/*"],
-			"@components/*": ["src/components/*"],
-			"@types": ["src/types"]
+			"@/*": ["src/*"]
 		},
 
 		/* Bundler mode */

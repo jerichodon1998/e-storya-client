@@ -1,5 +1,5 @@
-import { axiosInstance, useAppStore } from "@lib";
-import type { IUser } from "@types";
+import { axiosInstance, useAppStore } from "@/lib";
+import type { IUser } from "@/types";
 import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 

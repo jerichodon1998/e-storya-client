@@ -1,5 +1,5 @@
-import { axiosInstance, isValidObjectId } from "@lib";
-import type { IMessage } from "@types";
+import { axiosInstance, isValidObjectId } from "@/lib";
+import type { IMessage } from "@/types";
 import { AxiosError } from "axios";
 import type { ObjectId } from "bson";
 

@@ -1,5 +1,5 @@
-import { axiosInstance } from "@lib";
-import type { IUser } from "@types";
+import { axiosInstance } from "@/lib";
+import type { IUser } from "@/types";
 import { AxiosError } from "axios";
 import { Outlet, redirect } from "react-router";
 import type { Route } from "./+types/protectedLayout";

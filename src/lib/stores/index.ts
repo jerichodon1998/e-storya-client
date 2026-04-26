@@ -1,4 +1,4 @@
-import type { IUser } from "@types";
+import type { IUser } from "@/types";
 import { create } from "zustand";
 import type { ClientWebSocketService } from "../services";
 

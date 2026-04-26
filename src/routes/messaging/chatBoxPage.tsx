@@ -1,4 +1,4 @@
-import ChatBox from "@components/messages/ChatBox";
+import ChatBox from "@/components/messages/ChatBox";
 
 function ChatBoxPage() {
 	return <ChatBox className="flex-1" />;

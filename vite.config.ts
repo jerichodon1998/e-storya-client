@@ -11,10 +11,7 @@ export default defineConfig({
 	resolve: {
 		tsconfigPaths: true,
 		alias: {
-			"@": `${process.cwd()}/src`,
-			"@lib": `${process.cwd()}/src/lib`,
-			"@hooks": `${process.cwd()}/src/hooks`,
-			"@components": `${process.cwd()}/src/components`,
+			"@/": `${process.cwd()}/src`,
 		},
 	},
 });

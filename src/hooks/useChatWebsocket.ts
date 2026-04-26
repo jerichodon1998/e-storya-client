@@ -1,4 +1,4 @@
-import { ClientWebSocketService, useWebSocketStore } from "@lib";
+import { ClientWebSocketService, useWebSocketStore } from "@/lib";
 import { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
 import { useMessages } from "./useMessages";

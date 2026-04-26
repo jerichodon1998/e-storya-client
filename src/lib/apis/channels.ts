@@ -1,5 +1,5 @@
-import { axiosInstance } from "@lib";
-import type { IChannel, IPagination } from "@types";
+import { axiosInstance } from "@/lib";
+import type { IChannel, IPagination } from "@/types";
 
 export function getChannelsApi() {
 	return axiosInstance.get<{

@@ -1,6 +1,6 @@
-import TopNavigationBar from "@components/topNavigationBar";
-import { axiosInstance } from "@lib";
-import type { IUser } from "@types";
+import TopNavigationBar from "@/components/topNavigationBar";
+import { axiosInstance } from "@/lib";
+import type { IUser } from "@/types";
 import { Outlet, redirect } from "react-router";
 import type { Route } from "./+types/main";
 import { AxiosError } from "axios";

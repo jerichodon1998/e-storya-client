@@ -1,4 +1,4 @@
-import type { IMessage } from "@types";
+import type { IMessage } from "@/types";
 import { ObjectId } from "bson";
 import { orderBy } from "lodash-es";
 

@@ -1,8 +1,8 @@
-import { useAuth } from "@hooks/useAuth";
-import { useChatWebsocket } from "@hooks/useChatWebsocket";
-import { useMessages } from "@hooks/useMessages";
-import { cn, sortMessages } from "@lib";
-import type { IMessage } from "@types";
+import { useAuth } from "@/hooks/useAuth";
+import { useChatWebsocket } from "@/hooks/useChatWebsocket";
+import { useMessages } from "@/hooks/useMessages";
+import { cn, sortMessages } from "@/lib";
+import type { IMessage } from "@/types";
 import { map } from "lodash-es";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";

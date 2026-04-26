@@ -1,4 +1,4 @@
-import { axiosInstance } from "@lib";
+import { axiosInstance } from "@/lib";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
