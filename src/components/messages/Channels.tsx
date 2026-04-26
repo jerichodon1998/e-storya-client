@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib";
 import { Link, useNavigate, useParams } from "react-router";
 import { head, map } from "lodash-es";
 import { useChannels } from "@/hooks/useChannels";
