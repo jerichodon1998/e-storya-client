@@ -1,4 +1,4 @@
-import Channels from "@/components/messages/Channels";
+import Channels from "@/components/messages/SideNavigation";
 import { Outlet } from "react-router";
 
 function MessagingPage() {

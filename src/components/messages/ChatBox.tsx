@@ -10,7 +10,7 @@ import { useParams } from "react-router";
 export default function ChatBox(props: {
 	className?: React.HTMLAttributes<HTMLDivElement>["className"];
 }) {
-	const scrollRef = useRef<HTMLUListElement | null>(null);
+	const chatListRef = useRef<HTMLUListElement | null>(null);
 
 	const { channelId } = useParams();
 
@@ -20,7 +20,7 @@ export default function ChatBox(props: {
 
 	const { className } = props;
 
-	const { messagesData, messagesDataFetchNextPage, messagesDataSuccess } =
+	const { messagesData, messagesDataFetchNextPage, messagesDataResSuccess } =
 		useMessages();
 
 	const { chatWebsocketService } = useChatWebsocket();
@@ -50,27 +50,30 @@ export default function ChatBox(props: {
 
 	const handleScroll = (e: React.UIEvent<HTMLUListElement, UIEvent>) => {
 		const { scrollTop } = e.currentTarget;
-		if (scrollTop === 0 && messagesDataSuccess) {
+
+		if (scrollTop === 0 && messagesDataResSuccess) {
 			messagesDataFetchNextPage();
 		}
 	};
 
 	useEffect(() => {
-		if (scrollRef.current) {
-			scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-		}
+		const element = chatListRef.current;
+
+		if (!element) return;
+
+		element.scrollTop = element.scrollHeight;
 	}, [messagesData]);
 
 	return (
 		<div
 			className={cn(
-				"p-4 shadow-md bg-gray-300 rounded-lg h-full flex flex-col justify-between gap-4 text-sm",
+				"p-4 border border-gray-400 bg-gray-300 rounded-lg h-full flex flex-col justify-between gap-4 text-sm",
 				className
 			)}
 		>
 			<ul
 				className="overflow-y-scroll flex flex-col gap-4 pr-4 h-full"
-				ref={scrollRef}
+				ref={chatListRef}
 				onScroll={handleScroll}
 			>
 				{map(sortMessages({ messages: messagesData }), (message, i) => {
@@ -82,7 +85,7 @@ export default function ChatBox(props: {
 							className={cn(
 								"rounded-lg py-1 px-2 flex",
 								message.userId === user?._id
-									? "self-end bg-blue-400"
+									? "self-end bg-gray-200"
 									: "self-start bg-gray-400"
 							)}
 						>

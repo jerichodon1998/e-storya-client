@@ -23,12 +23,12 @@ function useMessages() {
 
 	const {
 		data: messagesDataRes,
-		isLoading: messagesDataLoading,
-		isError: messagesDataError,
-		isFetching: messagesDataFetching,
+		isLoading: messagesDataResIsLoading,
+		isError: messagesDataResIsError,
+		isFetching: messagesDataResIsFetching,
 		refetch: messagesDataRefetch,
 		fetchNextPage: messagesDataFetchNextPage,
-		isSuccess: messagesDataSuccess,
+		isSuccess: messagesDataResSuccess,
 	} = useInfiniteQuery<
 		AxiosResponse<{
 			messages?: IMessage[];
@@ -41,6 +41,8 @@ function useMessages() {
 		getNextPageParam: (lastPage) => {
 			const lastPageMessages = lastPage?.data?.messages;
 
+			// this indicates that the last query result has less than messagesSizePerPage
+			// therefor, this is the last page
 			return size(lastPageMessages) === messagesSizePerPage
 				? {
 						lastSeenMessageId: last(lastPageMessages)?._id,
@@ -79,6 +81,7 @@ function useMessages() {
 					}),
 			});
 		},
+		staleTime: Infinity,
 	});
 
 	const messagesData = useMemo(() => {
@@ -93,6 +96,7 @@ function useMessages() {
 		return messages;
 	}, [messagesDataRes]);
 
+	// TODO: implement logic for edited/deleted messages
 	const syncNewMessage = (params: { message: IMessage }) => {
 		const messageChannelId = params.message.channelId;
 		const queryKeyArray = [messagesQueryKey, messageChannelId];
@@ -161,10 +165,10 @@ function useMessages() {
 	return {
 		messagesData,
 		messagesDataRes,
-		messagesDataSuccess,
-		messagesDataLoading,
-		messagesDataError,
-		messagesDataFetching,
+		messagesDataResSuccess,
+		messagesDataResIsLoading,
+		messagesDataResIsError,
+		messagesDataResIsFetching,
 		messagesDataRefetch,
 		messagesDataFetchNextPage,
 		syncNewMessage,

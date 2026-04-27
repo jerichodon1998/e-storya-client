@@ -4,7 +4,9 @@ import { head, map } from "lodash-es";
 import { useChannels } from "@/hooks/useChannels";
 import { useEffect } from "react";
 
-export default function Channels(props: {
+import SearchUser from "./SearchUser";
+
+export default function SideNavigation(props: {
 	className?: React.HTMLAttributes<HTMLDivElement>["className"];
 }) {
 	const navigate = useNavigate();
@@ -24,11 +26,14 @@ export default function Channels(props: {
 	return (
 		<div
 			className={cn(
-				"flex flex-col gap-2 p-2 shadow-md bg-gray-300 rounded-lg h-full",
+				"flex flex-col gap-2 p-2 border border-gray-400 shadow bg-gray-300 rounded-lg h-full",
 				className
 			)}
 		>
-			<h1>CHANNELS</h1>
+			<div className="flex justify-between items-center px-1">
+				<h1>Chats</h1>
+			</div>
+			<SearchUser className="pr-3" />
 			<div
 				id="messageBody"
 				className="overflow-y-scroll pr-1 h-[98%] box-border"
