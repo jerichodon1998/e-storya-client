@@ -6,29 +6,6 @@ import type {
 	MessageTypeEnum,
 } from "src/enums";
 
-export interface IUser {
-	_id: ObjectId | string;
-	username: string;
-	email: string;
-	firstName?: string;
-	lastName?: string;
-	password?: string;
-	createdAt: Date;
-	updatedAt?: Date;
-	deletedAt?: Date;
-}
-
-export interface IMessage {
-	_id: ObjectId | string;
-	content: string;
-	createdAt: Date;
-	updatedAt?: Date;
-	deletedAt?: Date;
-	userId: ObjectId | string;
-	type: MessageTypeEnum;
-	channelId: ObjectId | string;
-}
-
 export interface IMessage {
 	_id: ObjectId | string;
 	content: string;
@@ -77,6 +54,11 @@ export type ChannelMemberWithUser = IChannelMember & {
 	userId: IUser;
 };
 
+export type IChannelWithDirectMessageChannelMembers = {
+	channel: IChannel;
+	directMessageChannelMembers?: ChannelMemberWithUser[] | null | undefined;
+};
+
 export interface IPagination {
 	page: number;
 	sizePerPage: number;
@@ -85,3 +67,5 @@ export interface IPagination {
 	hasPreviousPage: boolean;
 	hasNextPage: boolean;
 }
+
+export * from "./websocket";

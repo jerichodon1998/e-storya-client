@@ -80,8 +80,6 @@ export function useSearchUser() {
 		},
 		initialPageParam: undefined,
 		queryFn: async (params) => {
-			console.log("searchUsersDataRefetch", params.pageParam);
-
 			const pageParam = params.pageParam as {
 				lastSeenUsername?: string;
 			};
@@ -105,7 +103,7 @@ export function useSearchUser() {
 				});
 			})
 		);
-		console.log("users", users);
+
 		return users;
 	}, [searchUsersDataRes]);
 

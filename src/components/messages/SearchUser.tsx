@@ -1,10 +1,11 @@
 import { useSearchUser } from "@/hooks/useSearchUser";
-import { cn } from "@/lib";
+import { cn, getDirectMessageUniqueKey } from "@/lib";
 import { isEmpty, isString, map } from "lodash-es";
 import { SearchIcon, XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useSearchParams } from "react-router";
+import { Link, useSearchParams } from "react-router";
+import { useAuth } from "@/hooks";
 
 export default function SearchUser(props: {
 	className?: React.HTMLAttributes<HTMLDivElement>["className"];
@@ -19,6 +20,8 @@ export default function SearchUser(props: {
 
 	const { searchUsersDataFetchNextPage, searchUsersData, searchText } =
 		useSearchUser();
+
+	const { user } = useAuth();
 
 	const [newSearchText, setNewSearchText] = useState(searchText || "");
 
@@ -94,16 +97,25 @@ export default function SearchUser(props: {
 					ref={searchUsersRef}
 					onScroll={handleScroll}
 				>
-					{map(searchUsersData, (users, i) => {
-						const itemKey = `${users._id}-${i}`;
+					{map(searchUsersData, (userData, i) => {
+						const itemKey = `${userData._id}-${i}`;
+						const directMessageUniqueKey = getDirectMessageUniqueKey([
+							userData._id,
+							user?._id,
+						]);
 
 						return (
 							<li
 								key={itemKey}
 								className="w-full hover:bg-gray-200 p-2 rounded cursor-pointer"
 							>
-								<h1 className="font-bold text-sm">{users.username}</h1>
-								<p className="font-light text-xs ">{users.email}</p>
+								<Link
+									className="w-full h-full"
+									to={`/messaging/${directMessageUniqueKey}`}
+								>
+									<h1 className="font-bold text-sm">{userData.username}</h1>
+									<p className="font-light text-xs ">{user.email}</p>
+								</Link>
 							</li>
 						);
 					})}

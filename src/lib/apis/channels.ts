@@ -1,9 +1,12 @@
 import { axiosInstance } from "@/lib";
-import type { IChannel, IPagination } from "@/types";
+import type {
+	IChannelWithDirectMessageChannelMembers,
+	IPagination,
+} from "@/types";
 
 export function getChannelsApi() {
 	return axiosInstance.get<{
-		channels?: IChannel[] | null | undefined;
+		channels?: IChannelWithDirectMessageChannelMembers[] | null | undefined;
 		error?: any;
 		message?: string;
 		pagination?: IPagination | undefined;

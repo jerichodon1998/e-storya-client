@@ -11,13 +11,14 @@ import { useMemo } from "react";
 import { useParams } from "react-router";
 import type { IMessage } from "@/types";
 import type { AxiosResponse } from "axios";
+import { isValidObjectId, validateDirectMessageUniqueKey } from "@/lib";
 
 function useMessages() {
 	const queryClient = useQueryClient();
 
 	const params = useParams();
 
-	const channelId = params.channelId;
+	const conversationKey = params.conversationKey;
 
 	const { user } = useAuth();
 
@@ -36,13 +37,17 @@ function useMessages() {
 			message?: string;
 		}>
 	>({
-		queryKey: [messagesQueryKey, channelId],
-		enabled: !isEmpty(channelId) && !isEmpty(user),
+		queryKey: [messagesQueryKey, conversationKey],
+		enabled:
+			!isEmpty(conversationKey) &&
+			!isEmpty(user) &&
+			(isValidObjectId(conversationKey) ||
+				validateDirectMessageUniqueKey(conversationKey)),
 		getNextPageParam: (lastPage) => {
 			const lastPageMessages = lastPage?.data?.messages;
 
-			// this indicates that the last query result has less than messagesSizePerPage
-			// therefor, this is the last page
+			// if the last page has the same size as the messagesSizePerPage,
+			// then there's a next page, otherwise it's the last page
 			return size(lastPageMessages) === messagesSizePerPage
 				? {
 						lastSeenMessageId: last(lastPageMessages)?._id,
@@ -72,7 +77,7 @@ function useMessages() {
 			const lastSeenMessageCreatedAt = pageParam?.lastSeenMessageCreatedAt;
 
 			return await getMessagesApi({
-				channelId,
+				conversationKey,
 				sizePerPage: messagesSizePerPage,
 				...(lastSeenMessageId &&
 					lastSeenMessageCreatedAt && {

@@ -7,20 +7,20 @@ import type { ObjectId } from "bson";
  * Get Messages api
  * - cursor based query.
  *
- * @param {string} params.channelId
+ * @param {string} params.conversationKey - It's either a channelId or a directMessageUniqueKey.
  * @param {number} params.sizePerPage
  * @param {string | ObjectId} params.lastSeenMessageId
  * @param {string | Date} params.lastSeenMessageCreatedAt
  * @return {Promise<AxiosResponse<{ messages: IMessage[], error: any, message: string }>>}
  */
 export function getMessagesApi(params: {
-	channelId: string;
+	conversationKey: string;
 	sizePerPage?: number;
 	lastSeenMessageId?: string | ObjectId;
 	lastSeenMessageCreatedAt?: string | Date;
 }) {
 	const {
-		channelId,
+		conversationKey,
 		sizePerPage = 20,
 		lastSeenMessageId,
 		lastSeenMessageCreatedAt,
@@ -43,5 +43,5 @@ export function getMessagesApi(params: {
 		messages?: IMessage[] | null | undefined;
 		error?: any;
 		message?: string | undefined;
-	}>(`/v1/messages/${channelId}?${queryParams.toString()}`);
+	}>(`/v1/messages/${conversationKey}?${queryParams.toString()}`);
 }

@@ -1,15 +1,19 @@
 import { cn } from "@/lib";
 import { Link, useNavigate, useParams } from "react-router";
-import { head, map } from "lodash-es";
+import { filter, head, map } from "lodash-es";
 import { useChannels } from "@/hooks/useChannels";
 import { useEffect } from "react";
 
 import SearchUser from "./SearchUser";
+import { ChannelTypeEnum } from "@/enums";
+import { useAuth } from "@/hooks";
 
 export default function SideNavigation(props: {
 	className?: React.HTMLAttributes<HTMLDivElement>["className"];
 }) {
 	const navigate = useNavigate();
+
+	const { user } = useAuth();
 
 	const { channelId } = useParams();
 
@@ -19,7 +23,9 @@ export default function SideNavigation(props: {
 
 	useEffect(() => {
 		if (!channelId && head(channelsData)) {
-			navigate(`/messaging/${channelsData[0]?._id}`, { replace: true });
+			navigate(`/messaging/${channelsData[0]?.channel?._id}`, {
+				replace: true,
+			});
 		}
 	}, [channelsData]);
 
@@ -40,16 +46,28 @@ export default function SideNavigation(props: {
 			>
 				<ul className="flex flex-col grow gap-2">
 					{map(channelsData, (channel, i) => {
+						const isDirectMessage =
+							channel.channel.channelType === ChannelTypeEnum.DIRECT_MESSAGE;
+						const otherUser = head(
+							filter(
+								channel.directMessageChannelMembers,
+								(member) => member.userId._id !== user?._id
+							)
+						);
+						const channelName = isDirectMessage
+							? otherUser?.userId?.username
+							: channel.channel.name;
+
 						return (
 							<Link
-								key={`${channel._id}-${i}`}
-								to={`/messaging/${channel._id}`}
+								key={`${channel?.channel._id}-${i}`}
+								to={`/messaging/${channel.channel._id}`}
 								className={cn(
 									"py-1 px-2 hover:bg-gray-400 rounded-lg w-full",
-									channel._id === channelId && "bg-gray-400"
+									channel.channel._id === channelId && "bg-gray-400"
 								)}
 							>
-								{channel?.name}
+								{channelName}
 							</Link>
 						);
 					})}

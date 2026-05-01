@@ -1,8 +1,14 @@
+import { MessageTypeEnum } from "@/enums";
+import { useChatWebsocket } from "@/hooks";
 import { useAuth } from "@/hooks/useAuth";
-import { useChatWebsocket } from "@/hooks/useChatWebsocket";
 import { useMessages } from "@/hooks/useMessages";
-import { cn, sortMessages } from "@/lib";
-import type { IMessage } from "@/types";
+import {
+	cn,
+	isValidObjectId,
+	sortMessages,
+	validateDirectMessageUniqueKey,
+} from "@/lib";
+import type { IChatWebsocketPayload } from "@/types";
 import { map } from "lodash-es";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
@@ -10,9 +16,11 @@ import { useParams } from "react-router";
 export default function ChatBox(props: {
 	className?: React.HTMLAttributes<HTMLDivElement>["className"];
 }) {
+	const { chatWebsocketService } = useChatWebsocket();
+
 	const chatListRef = useRef<HTMLUListElement | null>(null);
 
-	const { channelId } = useParams();
+	const { conversationKey } = useParams();
 
 	const [message, setMessage] = useState("");
 
@@ -23,18 +31,23 @@ export default function ChatBox(props: {
 	const { messagesData, messagesDataFetchNextPage, messagesDataResSuccess } =
 		useMessages();
 
-	const { chatWebsocketService } = useChatWebsocket();
-
 	const handleSubmit = () => {
 		try {
 			const parsedMessage = JSON.stringify({
-				content: message,
-				userId: user?._id,
-				channelId,
-				type: "text",
-			} as Partial<IMessage>);
+				message: {
+					content: message,
+					userId: user?._id,
+					type: MessageTypeEnum.TEXT,
+					...(isValidObjectId(conversationKey) && {
+						channelId: conversationKey,
+					}),
+				},
+				...(validateDirectMessageUniqueKey(conversationKey) && {
+					directMessageUniqueKey: conversationKey,
+				}),
+			} as Partial<IChatWebsocketPayload>);
 
-			chatWebsocketService.websocket.send(parsedMessage);
+			chatWebsocketService?.websocket.send(parsedMessage);
 			setMessage("");
 		} catch (error) {
 			console.error("error", error);

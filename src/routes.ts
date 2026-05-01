@@ -13,7 +13,7 @@ export default [
 	]),
 	layout("./layouts/protected-layout/protectedLayout.tsx", [
 		route("messaging", "./routes/messaging/index.tsx", [
-			route(":channelId", "./routes/messaging/chatBoxPage.tsx"),
+			route(":conversationKey", "./routes/messaging/chatBoxPage.tsx"),
 		]),
 	]),
 ] satisfies RouteConfig;
