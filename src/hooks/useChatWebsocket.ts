@@ -1,5 +1,4 @@
-import { ClientWebSocketService, useWebSocketStore } from "@/lib";
-import { useEffect } from "react";
+import { useWebSocketStore } from "@/lib";
 import { useShallow } from "zustand/shallow";
 import { useMessages } from "./useMessages";
 
@@ -18,24 +17,7 @@ const useChatWebsocket = () => {
 		syncNewMessage({ message: parsedMessage });
 	};
 
-	useEffect(() => {
-		const chatWebsocketInstance = new ClientWebSocketService({
-			url: "ws://localhost:3001/v1/ws",
-			name: "chat app",
-			onmessage: onMessage,
-		});
-
-		if (!chatWebsocketService) {
-			setChatWebsocketService(chatWebsocketInstance);
-		}
-
-		return () => {
-			chatWebsocketInstance.close();
-			setChatWebsocketService(null);
-		};
-	}, []);
-
-	return { chatWebsocketService };
+	return { chatWebsocketService, onMessage, setChatWebsocketService };
 };
 
 export { useChatWebsocket };

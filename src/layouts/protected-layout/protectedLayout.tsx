@@ -1,10 +1,11 @@
-import { axiosInstance } from "@/lib";
+import { axiosInstance, ClientWebSocketService } from "@/lib";
 import type { IUser } from "@/types";
 import { AxiosError } from "axios";
 import { Outlet, redirect } from "react-router";
 import type { Route } from "./+types/protectedLayout";
+import { useChatWebsocket } from "@/hooks";
+import { useEffect } from "react";
 
-// eslint-disable-next-line
 export async function loader({ request }: Route.LoaderArgs) {
 	const cookieHeader = request.headers.get("cookie");
 	const url = new URL(request.url);
@@ -36,5 +37,27 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function ProtectedLayout() {
+	const { onMessage, chatWebsocketService, setChatWebsocketService } =
+		useChatWebsocket();
+
+	useEffect(() => {
+		let chatWebsocketInstance: ClientWebSocketService | null = null;
+
+		if (!chatWebsocketService) {
+			chatWebsocketInstance = new ClientWebSocketService({
+				url: "ws://localhost:3001/v1/ws",
+				name: "chat app",
+				onmessage: onMessage,
+			});
+
+			setChatWebsocketService(chatWebsocketInstance);
+		}
+
+		return () => {
+			chatWebsocketInstance.close();
+			setChatWebsocketService(null);
+		};
+	}, []);
+
 	return <Outlet />;
 }

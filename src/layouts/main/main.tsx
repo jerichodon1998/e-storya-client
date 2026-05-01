@@ -5,7 +5,6 @@ import { Outlet, redirect } from "react-router";
 import type { Route } from "./+types/main";
 import { AxiosError } from "axios";
 
-// eslint-disable-next-line
 export async function loader({ request }: Route.LoaderArgs) {
 	const cookieHeader = request.headers.get("cookie");
 	const url = new URL(request.url);
