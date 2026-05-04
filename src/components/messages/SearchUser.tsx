@@ -114,7 +114,7 @@ export default function SearchUser(props: {
 									to={`/messaging/${directMessageUniqueKey}`}
 								>
 									<h1 className="font-bold text-sm">{userData.username}</h1>
-									<p className="font-light text-xs ">{user.email}</p>
+									<p className="font-light text-xs ">{userData.email}</p>
 								</Link>
 							</li>
 						);

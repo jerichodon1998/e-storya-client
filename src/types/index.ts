@@ -15,6 +15,7 @@ export interface IMessage {
 	userId: ObjectId | string;
 	type: MessageTypeEnum;
 	channelId: ObjectId | string;
+	directMessageUniqueKey?: string;
 }
 
 export interface IUser {
@@ -34,9 +35,15 @@ export interface IChannel {
 	createdAt: Date;
 	updatedAt?: Date;
 	deletedAt?: Date;
+	lastActivityAt?: Date;
 	ownerId: ObjectId | string;
 	name: string;
 	channelType: ChannelTypeEnum;
+	/**
+	 * Direct message unique key.
+	 * - key = `${ObjectId.toString()}-${ObjectId.toString()}`
+	 */
+	directMessageUniqueKey: string;
 }
 
 export interface IChannelMember {

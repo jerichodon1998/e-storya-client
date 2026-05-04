@@ -1,4 +1,7 @@
-import type { IMessage } from "@/types";
+import type {
+	IChannelWithDirectMessageChannelMembers,
+	IMessage,
+} from "@/types";
 import { ObjectId } from "bson";
 import { isEmpty, isString, orderBy } from "lodash-es";
 
@@ -26,6 +29,17 @@ export function sortMessages(params: {
 	const { messages, order = "asc" } = params;
 
 	return orderBy(messages, ["createdAt", "_id"], [order, order]);
+}
+
+export function sortChannels(params: {
+	channels: IChannelWithDirectMessageChannelMembers[];
+	order?: "asc" | "desc";
+}): IChannelWithDirectMessageChannelMembers[] {
+	const { channels, order = "asc" } = params;
+
+	return orderBy(channels, (channel) => channel?.channel?.lastActivityAt, [
+		order,
+	]);
 }
 
 /**

@@ -3,10 +3,10 @@ import { Link, useNavigate, useParams } from "react-router";
 import { filter, head, map } from "lodash-es";
 import { useChannels } from "@/hooks/useChannels";
 import { useEffect } from "react";
-
-import SearchUser from "./SearchUser";
 import { ChannelTypeEnum } from "@/enums";
 import { useAuth } from "@/hooks";
+
+import SearchUser from "./SearchUser";
 
 export default function SideNavigation(props: {
 	className?: React.HTMLAttributes<HTMLDivElement>["className"];
@@ -15,14 +15,23 @@ export default function SideNavigation(props: {
 
 	const { user } = useAuth();
 
-	const { channelId } = useParams();
+	const { conversationKey } = useParams();
 
 	const { className } = props;
 
-	const { channelsData } = useChannels();
+	const { channelsData, channelsDataResSuccess, channelsDataFetchNextPage } =
+		useChannels();
+
+	const handleScroll = (e: React.UIEvent<HTMLDivElement, UIEvent>) => {
+		const { scrollTop, clientHeight, scrollHeight } = e.currentTarget;
+
+		if (scrollTop + clientHeight >= scrollHeight && channelsDataResSuccess) {
+			channelsDataFetchNextPage();
+		}
+	};
 
 	useEffect(() => {
-		if (!channelId && head(channelsData)) {
+		if (!conversationKey && head(channelsData)) {
 			navigate(`/messaging/${channelsData[0]?.channel?._id}`, {
 				replace: true,
 			});
@@ -43,11 +52,12 @@ export default function SideNavigation(props: {
 			<div
 				id="messageBody"
 				className="overflow-y-scroll pr-1 h-[98%] box-border"
+				onScroll={handleScroll}
 			>
 				<ul className="flex flex-col grow gap-2">
 					{map(channelsData, (channel, i) => {
 						const isDirectMessage =
-							channel.channel.channelType === ChannelTypeEnum.DIRECT_MESSAGE;
+							channel.channel?.channelType === ChannelTypeEnum.DIRECT_MESSAGE;
 						const otherUser = head(
 							filter(
 								channel.directMessageChannelMembers,
@@ -56,15 +66,18 @@ export default function SideNavigation(props: {
 						);
 						const channelName = isDirectMessage
 							? otherUser?.userId?.username
-							: channel.channel.name;
+							: channel.channel?.name;
 
 						return (
 							<Link
 								key={`${channel?.channel._id}-${i}`}
-								to={`/messaging/${channel.channel._id}`}
+								to={`/messaging/${isDirectMessage ? channel.channel.directMessageUniqueKey : channel?.channel._id}`}
 								className={cn(
 									"py-1 px-2 hover:bg-gray-400 rounded-lg w-full",
-									channel.channel._id === channelId && "bg-gray-400"
+									(channel.channel._id === conversationKey ||
+										channel.channel?.directMessageUniqueKey ===
+											conversationKey) &&
+										"bg-gray-400"
 								)}
 							>
 								{channelName}

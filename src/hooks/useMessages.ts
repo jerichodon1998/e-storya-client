@@ -13,6 +13,14 @@ import type { IMessage } from "@/types";
 import type { AxiosResponse } from "axios";
 import { isValidObjectId, validateDirectMessageUniqueKey } from "@/lib";
 
+type MessagesInfiniteQueryGeneric = InfiniteData<
+	AxiosResponse<{
+		messages?: IMessage[];
+		error?: any;
+		message?: string;
+	}>
+>;
+
 function useMessages() {
 	const queryClient = useQueryClient();
 
@@ -103,25 +111,12 @@ function useMessages() {
 
 	// TODO: implement logic for edited/deleted messages
 	const syncNewMessage = (params: { message: IMessage }) => {
-		const messageChannelId = params.message.channelId;
-		const queryKeyArray = [messagesQueryKey, messageChannelId];
+		const newMessageConversationKey =
+			params?.message?.directMessageUniqueKey ?? params?.message?.channelId;
+		const queryKeyArray = [messagesQueryKey, newMessageConversationKey];
 		queryClient.setQueryData(
 			queryKeyArray,
-			(
-				oldData: InfiniteData<
-					AxiosResponse<{
-						messages?: IMessage[];
-						error?: any;
-						message?: string;
-					}>
-				>
-			): InfiniteData<
-				AxiosResponse<{
-					messages?: IMessage[];
-					error?: any;
-					message?: string;
-				}>
-			> => {
+			(oldData: MessagesInfiniteQueryGeneric): MessagesInfiniteQueryGeneric => {
 				const { message } = params;
 				const pages = oldData?.pages || [];
 				/**
@@ -148,6 +143,18 @@ function useMessages() {
 				// 		pages: pagesWithNewMessage,
 				// 	};
 				// }
+
+				if (!oldData) {
+					const data = {
+						pages: [
+							{
+								data: { messages: [params.message], message: "Success." },
+							},
+						],
+						pageParams: [],
+					} as MessagesInfiniteQueryGeneric;
+					return data;
+				}
 
 				const pagesWithNewPageAndNewMessage = [
 					...pages,

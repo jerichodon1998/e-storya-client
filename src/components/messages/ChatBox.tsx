@@ -1,4 +1,4 @@
-import { MessageTypeEnum } from "@/enums";
+import { MessageTypeEnum, WebsocketMessageEventTypeEnum } from "@/enums";
 import { useChatWebsocket } from "@/hooks";
 import { useAuth } from "@/hooks/useAuth";
 import { useMessages } from "@/hooks/useMessages";
@@ -8,7 +8,7 @@ import {
 	sortMessages,
 	validateDirectMessageUniqueKey,
 } from "@/lib";
-import type { IChatWebsocketPayload } from "@/types";
+import type { IChatWebsocketPayloadOnSend } from "@/types";
 import { map } from "lodash-es";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router";
@@ -33,7 +33,8 @@ export default function ChatBox(props: {
 
 	const handleSubmit = () => {
 		try {
-			const parsedMessage = JSON.stringify({
+			const payload: IChatWebsocketPayloadOnSend = {
+				event: WebsocketMessageEventTypeEnum.MESSAGE_SENDING,
 				message: {
 					content: message,
 					userId: user?._id,
@@ -41,13 +42,17 @@ export default function ChatBox(props: {
 					...(isValidObjectId(conversationKey) && {
 						channelId: conversationKey,
 					}),
+					...(validateDirectMessageUniqueKey(conversationKey) && {
+						directMessageUniqueKey: conversationKey,
+					}),
 				},
 				...(validateDirectMessageUniqueKey(conversationKey) && {
 					directMessageUniqueKey: conversationKey,
 				}),
-			} as Partial<IChatWebsocketPayload>);
+			};
+			const stringifiedPayload = JSON.stringify(payload);
 
-			chatWebsocketService?.websocket.send(parsedMessage);
+			chatWebsocketService?.websocket.send(stringifiedPayload);
 			setMessage("");
 		} catch (error) {
 			console.error("error", error);
