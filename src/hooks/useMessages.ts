@@ -4,7 +4,7 @@ import {
 	type InfiniteData,
 } from "@tanstack/react-query";
 import { messagesQueryKey, messagesSizePerPage } from "src/constants";
-import { flatMap, head, isEmpty, last, map, size } from "lodash-es";
+import { flatMap, head, isEmpty, last, map, size, slice } from "lodash-es";
 import { useAuth } from "./useAuth";
 import { getMessagesApi } from "src/lib/apis";
 import { useMemo } from "react";
@@ -106,6 +106,8 @@ function useMessages() {
 			})
 		);
 
+		console.log("messagesDataRes", messagesDataRes);
+
 		return messages;
 	}, [messagesDataRes]);
 
@@ -119,30 +121,25 @@ function useMessages() {
 			(oldData: MessagesInfiniteQueryGeneric): MessagesInfiniteQueryGeneric => {
 				const { message } = params;
 				const pages = oldData?.pages || [];
-				/**
-				 * TODO: implement logic to add new message to last page if there's still space on last page.
-				 * PS: This should be the correct implementation but I encountered a bug in useMemo where the memo doesn't update when the data.messages array
-				 * is updated. But will definitely fix this later.
-				 */
-				// const lastPage = pages[size(pages) - 1];
-				// const lastPageCurrentMessagesSize = size(lastPage);
-				// const isThereAvailableSlotOnLastPage =
-				// 	lastPageCurrentMessagesSize < messagesSizePerPage;
+				const lastPage = last(pages);
+				const lastPageCurrentMessagesSize = size(lastPage?.data?.messages);
+				const isThereAvailableSlotOnLastPage =
+					lastPageCurrentMessagesSize < messagesSizePerPage;
 
-				// if (isThereAvailableSlotOnLastPage) {
-				// 	const pagesWithNewMessage = pages;
-				// 	pagesWithNewMessage[0] = {
-				// 		...lastPage,
-				// 		data: { messages: [message, ...lastPage.data.messages] },
-				// 	};
+				if (isThereAvailableSlotOnLastPage) {
+					const pagesWithNewMessage = [
+						...slice(pages, 0, size(pages) - 1),
+						{
+							...lastPage,
+							data: { messages: [message, ...lastPage.data.messages] },
+						},
+					];
 
-				// 	console.log("pagesWithNewMessage", pagesWithNewMessage);
-
-				// 	return {
-				// 		...oldData,
-				// 		pages: pagesWithNewMessage,
-				// 	};
-				// }
+					return {
+						...oldData,
+						pages: pagesWithNewMessage,
+					};
+				}
 
 				if (!oldData) {
 					const data = {
