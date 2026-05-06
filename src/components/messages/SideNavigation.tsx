@@ -32,9 +32,12 @@ export default function SideNavigation(props: {
 
 	useEffect(() => {
 		if (!conversationKey && head(channelsData)) {
-			navigate(`/messaging/${channelsData[0]?.channel?._id}`, {
-				replace: true,
-			});
+			navigate(
+				`/messaging/${channelsData[0]?.channel?.directMessageUniqueKey ?? channelsData[0]?.channel?._id}`,
+				{
+					replace: true,
+				}
+			);
 		}
 	}, [channelsData]);
 

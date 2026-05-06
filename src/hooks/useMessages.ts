@@ -9,7 +9,7 @@ import { useAuth } from "./useAuth";
 import { getMessagesApi } from "src/lib/apis";
 import { useMemo } from "react";
 import { useParams } from "react-router";
-import type { IMessage } from "@/types";
+import type { IChatWebsocketPayloadOnMessage, IMessage } from "@/types";
 import type { AxiosResponse } from "axios";
 import { isValidObjectId, validateDirectMessageUniqueKey } from "@/lib";
 
@@ -106,16 +106,14 @@ function useMessages() {
 			})
 		);
 
-		console.log("messagesDataRes", messagesDataRes);
-
 		return messages;
 	}, [messagesDataRes]);
 
 	// TODO: implement logic for edited/deleted messages
-	const syncNewMessage = (params: { message: IMessage }) => {
-		const newMessageConversationKey =
+	const syncNewMessage = (params: IChatWebsocketPayloadOnMessage) => {
+		const payloadConversationKey =
 			params?.message?.directMessageUniqueKey ?? params?.message?.channelId;
-		const queryKeyArray = [messagesQueryKey, newMessageConversationKey];
+		const queryKeyArray = [messagesQueryKey, payloadConversationKey];
 		queryClient.setQueryData(
 			queryKeyArray,
 			(oldData: MessagesInfiniteQueryGeneric): MessagesInfiniteQueryGeneric => {
@@ -131,7 +129,9 @@ function useMessages() {
 						...slice(pages, 0, size(pages) - 1),
 						{
 							...lastPage,
-							data: { messages: [message, ...lastPage.data.messages] },
+							data: {
+								messages: [message, ...(lastPage?.data?.messages ?? [])],
+							},
 						},
 					];
 

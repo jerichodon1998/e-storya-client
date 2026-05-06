@@ -21,7 +21,7 @@ const useChatWebsocket = () => {
 			event.data
 		) as IChatWebsocketPayloadOnMessage;
 		if (parsedPayload.message) {
-			syncNewMessage({ message: parsedPayload.message });
+			syncNewMessage(parsedPayload);
 		}
 
 		if (parsedPayload.channel) {
