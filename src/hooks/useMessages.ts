@@ -124,7 +124,19 @@ function useMessages() {
 				const isThereAvailableSlotOnLastPage =
 					lastPageCurrentMessagesSize < messagesSizePerPage;
 
-				if (isThereAvailableSlotOnLastPage) {
+				if (!oldData) {
+					const data = {
+						pages: [
+							{
+								data: { messages: [params.message], message: "Success." },
+							},
+						],
+						pageParams: [],
+					} as MessagesInfiniteQueryGeneric;
+					return data;
+				}
+
+				if (isThereAvailableSlotOnLastPage && oldData) {
 					const pagesWithNewMessage = [
 						...slice(pages, 0, size(pages) - 1),
 						{
@@ -139,18 +151,6 @@ function useMessages() {
 						...oldData,
 						pages: pagesWithNewMessage,
 					};
-				}
-
-				if (!oldData) {
-					const data = {
-						pages: [
-							{
-								data: { messages: [params.message], message: "Success." },
-							},
-						],
-						pageParams: [],
-					} as MessagesInfiniteQueryGeneric;
-					return data;
 				}
 
 				const pagesWithNewPageAndNewMessage = [
